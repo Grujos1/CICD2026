@@ -87,26 +87,26 @@ jobs:
       # Étape 6 : Installer kubectl
       # kubectl est nécessaire pour déployer dans k3s
       # ------------------------------------------------------------
-      #- name: Install kubectl
-      #  run: |
-      #    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-      #    chmod +x kubectl
-      #    sudo mv kubectl /usr/local/bin/kubectl
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
 
       # ------------------------------------------------------------
       # Étape 7 : Configurer le kubeconfig
       # Le kubeconfig fourni par le professeur est stocké dans un secret
       # On le sauvegarde dans un fichier local et on le protège (chmod 600)
       # ------------------------------------------------------------
-      #- name: Configure kubeconfig
-      #  run: |
-      #    echo "${{ secrets.KUBECONFIG_CONTENT }}" > kubeconfig
-      #    chmod 600 kubeconfig
-      #    export KUBECONFIG=$PWD/kubeconfig
-      #    echo "KUBECONFIG=$PWD/kubeconfig" >> $GITHUB_ENV
+      - name: Configure kubeconfig
+        run: |
+          echo "${{ secrets.KUBECONFIG_CONTENT }}" > kubeconfig
+          chmod 600 kubeconfig
+          export KUBECONFIG=$PWD/kubeconfig
+          echo "KUBECONFIG=$PWD/kubeconfig" >> $GITHUB_ENV
 
       # ------------------------------------------------------------
-      # Étape 7 : Mettre à jour le manifest Kubernetes
+      # Étape 8 : Mettre à jour le manifest Kubernetes
       # Remplace DOCKER_HUB_USERNAME/hello-app:TAG
       # par le vrai nom d'image + tag (ex: danny/hello-app:dev)
       #
@@ -119,21 +119,21 @@ jobs:
  #         sed -i "s|DOCKER_HUB_USERNAME/hello-app:${{ steps.vars.outputs.TAG }}|${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.TAG }}|g" k8s/deployment-${{ steps.vars.outputs.K8S_ENV }}.yaml
       
       # ------------------------------------------------------------
-      # Étape 8 : Force rollout annotation
+      # Étape 9 : Force rollout annotation
       # Force un nouveau déploiement même si le manifest n’a pas changé
       # ------------------------------------------------------------ 
       - name: Force rollout annotation
         run: |
           kubectl annotate deployment hello-app kubernetes.io/change-cause="$(date)" --overwrite -n ${{ steps.vars.outputs.K8S_ENV }}
       # ------------------------------------------------------------
-      # Étape 9 : Déployer dans Kubernetes
+      # Étape 10 : Déployer dans Kubernetes
       # kubectl apply met à jour ou crée les ressources
       # ------------------------------------------------------------
       - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f k8s/deployment.yaml -n ${{ steps.vars.outputs.K8S_ENV }}
       # ------------------------------------------------------------
-      # Étape 10 : Vérifier le rollout
+      # Étape 11 : Vérifier le rollout
       # Attend que le déploiement soit terminé et confirme que tout fonctionne
       # ------------------------------------------------------------ 
       - name: Verify rollout
