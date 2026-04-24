@@ -120,7 +120,7 @@ jobs:
       
       # ------------------------------------------------------------
       # Étape 9 : Force rollout annotation
-      # Force un nouveau déploiement même si le manifest n’a pas changé
+      # Force un nouveau déploiement même si le manifest nS’a pas changé
       # ------------------------------------------------------------ 
       - name: Force rollout annotation
         run: |
